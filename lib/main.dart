@@ -1,10 +1,10 @@
-import 'package:doctor_calender/calendar.dart';
+import 'package:doctor_calender/bookingpage.dart';
+import 'package:doctor_calender/calendarwidget.dart';
 import 'package:doctor_calender/consult.dart';
 import 'package:doctor_calender/dashboard.dart';
 import 'package:doctor_calender/notifications.dart';
 import 'package:doctor_calender/sidenav.dart';
 import 'package:doctor_calender/usersettings.dart';
-import 'package:doctor_calender/slotortoken.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -13,7 +13,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-    
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,14 +25,16 @@ class MyApp extends StatelessWidget {
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
-    
+
   @override
   _HomePageState createState() => _HomePageState();
 }
-  
+
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0; // State tracking for which item is selected
-    
+  bool showBookingPage = false;
+  int selectedIndex = -1; // Track which button is selected
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,15 +76,13 @@ class _HomePageState extends State<HomePage> {
                 decoration: InputDecoration(
                   hintText: 'Search for a user',
                   hintStyle: TextStyle(color: Colors.grey[600]),
-                  prefixIcon:
-                      const Icon(Icons.search, color: Colors.grey),
+                  prefixIcon: const Icon(Icons.search, color: Colors.grey),
                   filled: true,
                   fillColor: Colors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(70.0),
                   ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 10),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 10),
                 ),
               ),
             ),
@@ -102,38 +102,67 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      // Body: layout side nav and main content side by side.
+
+      // Body: layout side nav and main content side by side
       body: Row(
         children: [
-          // The side navigation
-          SideNav(
-            selectedIndex: _selectedIndex,
-            onItemSelected: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
-          ),
-          // Main content area
+          // Side Navigation (First in Layout)
           Expanded(
-            child: _selectedIndex == 0
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // CalendarWidget will be at the top of this column.
-                      CalendarWidget(),
-                      // Other widgets can be added below.
-                      Expanded(
-                        child: SlotOrToken(),
-                      ),
-                    ],
-                  )
-                : Center(
-                    child: Text(
-                      SideNav.menuItems[_selectedIndex].title,
-                      style: const TextStyle(fontSize: 24),
-                    ),
+            flex: 1, // SideNav takes less space
+            child: SideNav(
+              selectedIndex: _selectedIndex,
+              onItemSelected: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                  showBookingPage = index == 0; // Only show SlotOrToken if first option is selected
+                });
+              },
+            ),
+          ),
+
+          // Main Content Section - Dynamically changing based on SideNav selection
+          Expanded(
+            flex: 3, // Main Content takes more space
+            child: Column(
+              children: [
+                // Display content based on selected SideNav item
+                Expanded(
+                  child: Container(
+                    width: double.infinity,
+                    color: Colors.white,
+                    child: _selectedIndex == 0
+                        ? Column(
+                            children: [
+                              CalendarWidget(
+                                onButtonPressed: (index) {
+                                  setState(() {
+                                    selectedIndex = index;
+                                    showBookingPage = index == 0; // Show SlotOrToken only when ButtonOne is pressed
+                                  });
+                                },
+                              ),
+                              Expanded(
+                                child: showBookingPage
+                                    ? BookingPage()
+                                    : Center(
+                                        child: Text(
+                                          "Select a Date",
+                                          style: const TextStyle(fontSize: 24, color: Colors.grey),
+                                        ),
+                                      ),
+                              ),
+                            ],
+                          )
+                        : Center(
+                            child: Text(
+                              SideNav.menuItems[_selectedIndex].title,
+                              style: const TextStyle(fontSize: 24),
+                            ),
+                          ),
                   ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

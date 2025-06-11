@@ -7,8 +7,9 @@ class SideNav extends StatelessWidget {
   SideNav({required this.selectedIndex, required this.onItemSelected});
 
   static final List<MenuItem> menuItems = [
-    MenuItem(title: 'Schedule Booking', icon: Icons.calendar_today),
-    MenuItem(title: 'Schedule Permanent Booking', icon: Icons.access_time),
+    MenuItem(title: 'Calendar', icon: Icons.calendar_today),
+    MenuItem(title: 'Slot Booking', icon: Icons.access_time),
+    MenuItem(title: 'Token Booking', icon: Icons.access_time),
     MenuItem(title: 'Set Reminders', icon: Icons.alarm),
     MenuItem(title: 'Messages', icon: Icons.message),
     MenuItem(title: 'Appoints', icon: Icons.show_chart),
